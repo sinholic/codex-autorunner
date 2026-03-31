@@ -8,8 +8,24 @@ function loadCredentials(inputPath, options = {}) {
   const strictMode = Boolean(options.strict);
   const resolvedPath = path.resolve(process.cwd(), inputPath || "credentials.local.json");
 
-  const raw = fs.readFileSync(resolvedPath, "utf8");
-  const config = JSON.parse(raw);
+  let raw;
+  try {
+    raw = fs.readFileSync(resolvedPath, "utf8");
+  } catch (readErr) {
+    const err = new Error(`Invalid credentials config at ${resolvedPath}`);
+    err.details = [`ERROR: Cannot read file: ${readErr.message}`];
+    throw err;
+  }
+
+  let config;
+  try {
+    config = JSON.parse(raw);
+  } catch (parseErr) {
+    const err = new Error(`Invalid credentials config at ${resolvedPath}`);
+    err.details = [`ERROR: Invalid JSON: ${parseErr.message}`];
+    throw err;
+  }
+
   const validation = validateConfig(config, { strict: strictMode });
 
   if (!validation.ok) {
