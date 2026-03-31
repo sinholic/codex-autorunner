@@ -16,13 +16,31 @@ function parseArgs(argv) {
     project: "unnamed-project"
   };
 
+  function consumeFlagValue(flagName, idx) {
+    const value = argv[idx + 1];
+    if (!value || value.startsWith("--")) {
+      throw new Error(`Missing value for ${flagName}`);
+    }
+    return value;
+  }
+
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === "--credentials") args.credentials = argv[++i];
-    else if (arg === "--connectors") args.connectors = argv[++i];
-    else if (arg === "--out") args.out = argv[++i];
-    else if (arg === "--project") args.project = argv[++i];
-    else if (arg === "--strict") args.strict = true;
+    if (arg === "--credentials") {
+      args.credentials = consumeFlagValue(arg, i);
+      i += 1;
+    } else if (arg === "--connectors") {
+      args.connectors = consumeFlagValue(arg, i);
+      i += 1;
+    } else if (arg === "--out") {
+      args.out = consumeFlagValue(arg, i);
+      i += 1;
+    } else if (arg === "--project") {
+      args.project = consumeFlagValue(arg, i);
+      i += 1;
+    } else if (arg === "--strict") {
+      args.strict = true;
+    }
   }
 
   return args;
@@ -88,7 +106,13 @@ function writeStageArtifact(outDir, stage, contract, context) {
 }
 
 function run() {
-  const args = parseArgs(process.argv.slice(2));
+  let args;
+  try {
+    args = parseArgs(process.argv.slice(2));
+  } catch (err) {
+    console.error(`ERROR: ${err.message}`);
+    process.exit(1);
+  }
   const root = process.cwd();
   const outDir = path.resolve(root, args.out);
   const connectorsPath = path.resolve(root, args.connectors);

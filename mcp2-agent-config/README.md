@@ -20,7 +20,7 @@ Source of truth untuk konfigurasi credential MCP2 agent.
 ## Validation
 
 ```bash
-cd /Users/sproutoffice/apps/codex-autorunner/mcp2-agent-config
+cd mcp2-agent-config
 node validate-credentials.cjs credentials.local.json
 ```
 
@@ -38,8 +38,8 @@ node validate-credentials.cjs credentials.local.json --strict
 
 ## Agent Contract
 
-- Agent baca file JSON dari path konsisten:
-  - `/Users/sproutoffice/apps/codex-autorunner/mcp2-agent-config/credentials.local.json`
+- Agent baca file JSON dari path yang diberikan via argumen `--credentials`,
+  atau default `credentials.local.json` dari current working directory (CWD).
 - Agent wajib menganggap field kosong sebagai `not configured`.
 - Agent hanya pakai connector dengan `status = active`.
 - Gunakan `schema_version` untuk menjaga kompatibilitas format.
@@ -47,9 +47,9 @@ node validate-credentials.cjs credentials.local.json --strict
 ## Run Orchestrator
 
 ```bash
-cd /Users/sproutoffice/apps/codex-autorunner/mcp2-agent-config
+cd mcp2-agent-config
 node sdlc-orchestrator.cjs \
-  --credentials credentials.local.json \
+  --credentials ./credentials.local.json \
   --connectors connectors.map.json \
   --out artifacts \
   --project your-project-name \
