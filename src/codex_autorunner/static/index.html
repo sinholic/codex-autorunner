@@ -631,6 +631,7 @@
               <div class="ticket-overflow-dropdown hidden" id="ticket-overflow-dropdown">
                 <button class="ticket-overflow-item" id="ticket-overflow-new">+ New Ticket</button>
                 <button class="ticket-overflow-item hidden" id="ticket-overflow-template">From Template</button>
+                <button class="ticket-overflow-item" id="ticket-overflow-jira">From Jira</button>
                 <button class="ticket-overflow-item" id="ticket-overflow-restart" style="display:none;">Restart</button>
                 <button class="ticket-overflow-item" id="ticket-overflow-archive" style="display:none;">Archive
                   Flow</button>
@@ -643,6 +644,7 @@
                 title="Create from template">▾</button>
               <div class="ticket-new-dropdown hidden" id="ticket-new-dropdown">
                 <button class="ticket-new-dropdown-item" id="ticket-new-from-template">From Template</button>
+                <button class="ticket-new-dropdown-item" id="ticket-new-from-jira">From Jira</button>
               </div>
             </div>
           </div>
@@ -748,7 +750,7 @@
             <div class="modal-header ticket-editor-header">
               <div class="ticket-header-row">
                 <select class="ticket-fm-select" id="ticket-fm-agent" title="Agent">
-                  <option value="codex">codex</option>
+                  <option value="claude">claude</option>
                   <option value="opencode">opencode</option>
                   <option value="user">user</option>
                 </select>
@@ -887,7 +889,7 @@
                   <label class="ticket-template-option-label">Agent:</label>
                   <select class="ticket-template-agent-select" id="ticket-template-agent">
                     <option value="">default</option>
-                    <option value="codex">codex</option>
+                    <option value="claude">claude</option>
                     <option value="opencode">opencode</option>
                     <option value="user">user</option>
                   </select>
@@ -895,6 +897,48 @@
                 <div class="ticket-template-actions">
                   <button class="ghost sm" id="ticket-template-cancel">Cancel</button>
                   <button class="primary sm" id="ticket-template-apply" disabled>Create</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Jira Import Modal -->
+        <div class="modal-overlay hidden" id="ticket-jira-modal">
+          <div class="modal-content ticket-template-modal-content">
+            <div class="modal-header ticket-template-header">
+              <span class="ticket-template-title">Import from Jira</span>
+              <button class="ghost sm icon-btn" id="ticket-jira-close" title="Close">×</button>
+            </div>
+            <div class="ticket-template-body">
+              <div class="ticket-template-input-section">
+                <div class="ticket-template-input-wrapper">
+                  <input class="ticket-template-input" id="ticket-jira-key" type="text"
+                    placeholder="Issue key, e.g. ZEL-964" spellcheck="false" autocomplete="off">
+                  <button class="ghost sm" id="ticket-jira-fetch" type="button">Fetch</button>
+                </div>
+                <span class="muted small" id="ticket-jira-status"></span>
+              </div>
+
+              <div class="ticket-template-preview-section">
+                <div class="ticket-template-preview-header">
+                  <span class="ticket-template-preview-label">Preview</span>
+                </div>
+                <div class="ticket-jira-issue-list" id="ticket-jira-preview">Enter a Jira issue key and fetch to preview.</div>
+              </div>
+
+              <div class="ticket-template-error hidden" id="ticket-jira-error"></div>
+
+              <div class="ticket-template-footer">
+                <div class="ticket-template-options">
+                  <label class="ticket-template-option-label">Agent:</label>
+                  <select class="ticket-template-agent-select" id="ticket-jira-agent">
+                    <option value="claude" selected>Claude</option>
+                    <option value="opencode">OpenCode</option>
+                  </select>
+                </div>
+                <div class="ticket-template-actions">
+                  <button class="ghost sm" id="ticket-jira-cancel">Cancel</button>
+                  <button class="primary sm" id="ticket-jira-apply" disabled>Import selected</button>
                 </div>
               </div>
             </div>

@@ -22,6 +22,7 @@ import { initTicketChatEvents, renderTicketEvents, renderTicketMessages } from "
 import { initChatPasteUpload } from "./chatUploads.js";
 import { DocEditor } from "./docEditor.js";
 import { initTicketTemplates } from "./ticketTemplates.js";
+import { initJiraImport } from "./jiraImport.js";
 
 type TicketData = {
   path?: string;
@@ -997,6 +998,9 @@ export function initTicketEditor(): void {
 
   // Initialize ticket templates picker
   initTicketTemplates();
+
+  // Initialize Jira import
+  initJiraImport();
 
   // Button handlers
   if (deleteBtn) deleteBtn.addEventListener("click", () => void deleteTicket());

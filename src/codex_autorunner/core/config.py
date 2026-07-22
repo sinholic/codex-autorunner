@@ -94,6 +94,9 @@ def _default_agents_section() -> Dict[str, Any]:
         "zeroclaw": {
             "binary": "zeroclaw",
         },
+        "claude": {
+            "binary": "claude",
+        },
         "hermes": {
             "binary": "hermes",
         },

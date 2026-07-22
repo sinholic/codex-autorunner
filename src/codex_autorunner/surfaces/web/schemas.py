@@ -488,6 +488,39 @@ class SystemUpdateRequest(Payload):
     force: bool = False
 
 
+class JiraIssueSummary(ResponseModel):
+    key: str
+    summary: str
+    is_epic: bool
+    description_text: str
+    url: str
+
+
+class JiraPreviewRequest(Payload):
+    key: str
+
+
+class JiraPreviewResponse(ResponseModel):
+    issue: JiraIssueSummary
+    children: List[JiraIssueSummary]
+
+
+class JiraApplyRequest(Payload):
+    keys: List[str]
+    agent: str = "claude"
+
+
+class JiraApplyResult(ResponseModel):
+    key: str
+    created_path: str
+    filename: str
+    index: int
+
+
+class JiraApplyResponse(ResponseModel):
+    results: List[JiraApplyResult]
+
+
 class SystemUpdateTargetOption(ResponseModel):
     value: str
     label: str

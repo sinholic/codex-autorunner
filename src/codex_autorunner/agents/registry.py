@@ -18,6 +18,8 @@ from .hermes.supervisor import (
     hermes_binary_available,
     hermes_runtime_preflight,
 )
+from .claude.harness import CLAUDE_CAPABILITIES, ClaudeHarness
+from .claude.supervisor import build_claude_supervisor_from_config, claude_binary_available
 from .opencode.harness import OpenCodeHarness
 from .types import RuntimeCapability, normalize_runtime_capabilities
 from .zeroclaw.harness import ZEROCLAW_CAPABILITIES, ZeroClawHarness
@@ -47,6 +49,7 @@ class AgentDescriptor:
     make_harness: Callable[[Any], AgentHarness]
     healthcheck: Optional[Callable[[Any], bool]] = None
     plugin_api_version: int = CAR_PLUGIN_API_VERSION
+    hidden: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -114,6 +117,42 @@ def _check_zeroclaw_health(ctx: Any) -> bool:
     binary = getattr(ctx, "zeroclaw_binary", None)
     if isinstance(binary, str) and binary.strip():
         return zeroclaw_binary_available(
+            type(
+                "_InlineConfig",
+                (),
+                {"agent_binary": staticmethod(lambda _agent_id: binary.strip())},
+            )()
+        )
+    return False
+
+
+def _make_claude_harness(ctx: Any) -> AgentHarness:
+    supervisor = getattr(ctx, "claude_supervisor", None)
+    if supervisor is None:
+        config = _resolve_runtime_agent_config(ctx)
+        logger = getattr(ctx, "logger", None)
+        if config is None:
+            raise RuntimeError("Claude harness unavailable: config missing")
+        supervisor = build_claude_supervisor_from_config(config, logger=logger)
+        if supervisor is None:
+            raise RuntimeError("Claude harness unavailable: binary not configured")
+        try:
+            ctx.claude_supervisor = supervisor
+        except Exception:
+            pass
+    return ClaudeHarness(supervisor)
+
+
+def _check_claude_health(ctx: Any) -> bool:
+    supervisor = getattr(ctx, "claude_supervisor", None)
+    if supervisor is not None:
+        return True
+    config = _resolve_runtime_agent_config(ctx)
+    if config is not None:
+        return claude_binary_available(config)
+    binary = getattr(ctx, "claude_binary", None)
+    if isinstance(binary, str) and binary.strip():
+        return claude_binary_available(
             type(
                 "_InlineConfig",
                 (),
@@ -232,6 +271,7 @@ _BUILTIN_AGENTS: dict[str, AgentDescriptor] = {
         ),
         make_harness=_make_codex_harness,
         healthcheck=_check_codex_health,
+        hidden=True,  # only claude + opencode are user-facing; kept resolvable as fallback
     ),
     "opencode": AgentDescriptor(
         id="opencode",
@@ -256,6 +296,14 @@ _BUILTIN_AGENTS: dict[str, AgentDescriptor] = {
         capabilities=ZEROCLAW_CAPABILITIES,
         make_harness=_make_zeroclaw_harness,
         healthcheck=_check_zeroclaw_health,
+        hidden=True,  # superseded by "claude" id; kept resolvable for legacy configs/tickets
+    ),
+    "claude": AgentDescriptor(
+        id="claude",
+        name="Claude",
+        capabilities=CLAUDE_CAPABILITIES,
+        make_harness=_make_claude_harness,
+        healthcheck=_check_claude_health,
     ),
     "hermes": AgentDescriptor(
         id="hermes",
@@ -263,6 +311,7 @@ _BUILTIN_AGENTS: dict[str, AgentDescriptor] = {
         capabilities=HERMES_CAPABILITIES,
         make_harness=_make_hermes_harness,
         healthcheck=_check_hermes_health,
+        hidden=True,  # only claude + opencode are user-facing
     ),
 }
 
@@ -415,6 +464,8 @@ def get_registered_agents() -> dict[str, AgentDescriptor]:
 def get_available_agents(app_ctx: Any) -> dict[str, AgentDescriptor]:
     available: dict[str, AgentDescriptor] = {}
     for agent_id, descriptor in _all_agents().items():
+        if descriptor.hidden:
+            continue
         if descriptor.healthcheck is None or descriptor.healthcheck(app_ctx):
             available[agent_id] = descriptor
     return available

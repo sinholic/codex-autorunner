@@ -1,4 +1,3 @@
-// GENERATED FILE - do not edit directly. Source: static_src/
 /**
  * Ticket Editor Modal - handles creating, editing, and deleting tickets
  */
@@ -12,6 +11,7 @@ import { initTicketChatEvents, renderTicketEvents, renderTicketMessages } from "
 import { initChatPasteUpload } from "./chatUploads.js";
 import { DocEditor } from "./docEditor.js";
 import { initTicketTemplates } from "./ticketTemplates.js";
+import { initJiraImport } from "./jiraImport.js";
 const DEFAULT_FRONTMATTER = {
     agent: "codex",
     done: false,
@@ -811,6 +811,8 @@ export function initTicketEditor() {
     initTicketChatEvents();
     // Initialize ticket templates picker
     initTicketTemplates();
+    // Initialize Jira import
+    initJiraImport();
     // Button handlers
     if (deleteBtn)
         deleteBtn.addEventListener("click", () => void deleteTicket());
