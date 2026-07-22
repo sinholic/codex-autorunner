@@ -33,6 +33,7 @@ from .jira import build_jira_routes
 from .messages import build_messages_routes
 from .repos import build_repos_routes
 from .review import build_review_routes
+from .scm_review import build_scm_review_routes
 from .sessions import build_sessions_routes
 from .settings import build_settings_routes
 from .system import build_system_routes
@@ -68,6 +69,7 @@ def build_repo_router(static_dir: Path) -> APIRouter:
     router.include_router(build_messages_routes())
     router.include_router(build_repos_routes())
     router.include_router(build_review_routes())
+    router.include_router(build_scm_review_routes())
     router.include_router(build_sessions_routes())
     router.include_router(build_settings_routes())
     router.include_router(build_system_routes())

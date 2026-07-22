@@ -521,6 +521,40 @@ class JiraApplyResponse(ResponseModel):
     results: List[JiraApplyResult]
 
 
+class ScmReviewThreadSummary(ResponseModel):
+    discussion_id: str
+    author: str
+    body: str
+    file_path: Optional[str] = None
+    line: Optional[int] = None
+    url: str
+
+
+class ScmReviewPreviewRequest(Payload):
+    mr_url: str
+
+
+class ScmReviewPreviewResponse(ResponseModel):
+    threads: List[ScmReviewThreadSummary]
+
+
+class ScmReviewApplyRequest(Payload):
+    mr_url: str
+    discussion_ids: List[str]
+    agent: str = "claude"
+
+
+class ScmReviewApplyResult(ResponseModel):
+    discussion_id: str
+    created_path: str
+    filename: str
+    index: int
+
+
+class ScmReviewApplyResponse(ResponseModel):
+    results: List[ScmReviewApplyResult]
+
+
 class SystemUpdateTargetOption(ResponseModel):
     value: str
     label: str
